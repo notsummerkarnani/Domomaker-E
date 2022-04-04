@@ -7,40 +7,54 @@ const setName = (name) => _.escape(name).trim();
 
 const DomoSchema = new mongoose.Schema({
 
-  name: {
-    type: String,
-    required: true,
-    trim: true,
-    set: setName,
-  },
-  age: {
-    type: Number,
-    min: 0,
-    require: true,
-  },
-  owner: {
-    type: mongoose.Schema.ObjectId,
-    required: true,
-    ref: 'Account',
-  },
-  createdDate: {
-    type: Date,
-    default: Date.now,
-  },
+    name: {
+        type: String,
+        required: true,
+        trim: true,
+        set: setName,
+    },
+    age: {
+        type: Number,
+        min: 0,
+        require: true,
+    },
+    level: {
+        type: Number,
+        min: 0,
+        require: true,
+    },
+    owner: {
+        type: mongoose.Schema.ObjectId,
+        required: true,
+        ref: 'Account',
+    },
+    createdDate: {
+        type: Date,
+        default: Date.now,
+    },
 
 });
 
 DomoSchema.statics.toAPI = (doc) => ({
-  name: doc.name,
-  age: doc.age,
+    name: doc.name,
+    age: doc.age,
+    level: doc.level,
 });
 
 DomoSchema.statics.findByOwner = (ownerId, callback) => {
-  const search = {
-    // convert the string ownerId to an object id
-    owner: mongoose.Types.ObjectId(ownerId),
-  };
-  return DomoModel.find(search).select('name age').lean().exec(callback);
+    const search = {
+        // convert the string ownerId to an object id
+        owner: mongoose.Types.ObjectId(ownerId),
+    };
+    return DomoModel.find(search).select('name age level').lean().exec(callback);
+};
+
+DomoSchema.statics.findByOwnerAndDelete = (ownerId, callback) => {
+    const search = {
+        // convert the string ownerId to an object id
+        owner: mongoose.Types.ObjectId(ownerId),
+    };
+    return DomoModel.deleteMany(search).lean().exec(callback);
 };
 
 DomoModel = mongoose.model('Domo', DomoSchema);
